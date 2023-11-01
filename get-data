@@ -12,7 +12,7 @@
 if [ "$#" -eq 0 ];
 then echo "Input file required";
 else
-ouput_location=$1.csv
+output_location=$1.csv
 grep -Eoz "Now playing.*:[0-9]{2}" $1 |
 #Remove channel name lines by matching channel urls to empty lines.
 sed -E "/<.*@.*>/,/^$/D"|
