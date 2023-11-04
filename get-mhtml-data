@@ -4,7 +4,7 @@ if [ "$#" -eq 0 ];
 then echo "Input file required";
 else
 for arg in $@ ; do
-echo "title~views~since_upload">$arg'.csv'
+echo "title~views~since_upload~link">$arg'.csv'
 grep -Eoz "\"=?v=?i=?d=?e=?o=?-=?t=?i=?t=?l=?e=?-=?l=?i=?n=?k=?\"[^>]*>" $arg|
 tr -d '\000'|
 sed -E 's/[~\t]//g'|
@@ -12,6 +12,6 @@ tr '\n' '~'|
 sed -E 's/=?~//g'|
 tr '>' '\n'|
 sed -E "s/.*aria-label=3D\"([^\"]*)\"/\1/g"|
-#tr '\t' '\n'>>$arg'.csv';
+sed -E "s/.* by .* ([0-9,]+) views (.*) title=3D\"(.*)\" href=3D\"([^\"]+)\"/\3~\1~\2~\4/">>$arg'.csv'
 done;
 fi
