@@ -5,8 +5,8 @@ library(scales)
 # Get the working directory path, then update it to the path of the files to create a plot for
 # Path manually set here, but should be able to be updated so that it is automatically found
 working_dir <- getwd()
-folder1_25 <- "/data/1-50/1-25"
-directory_path <- paste(working_dir, folder1_25, sep = '')
+csv_files <- "/csv"
+directory_path <- paste(working_dir, csv_files, sep = '')
 
 # Set the working directory to the directory path set above
 setwd(directory_path)
@@ -28,12 +28,13 @@ for(file in files) {
   # Create a line graph
   p <- ggplot(data, aes(x = since_upload, y = views, group = 1)) +
     geom_line() +
-    labs(title = "Line Graph of Views Over Time", x = "Time Since Upload", y = "Views") +
-    scale_x_discrete(guide = guide_axis(check.overlap = TRUE)) +
-    scale_y_continuous(labels = label_comma()) +
+    labs(title = paste(file, "Line Graph of Views Over Time", sep = ': '), x = "Time Since Upload", y = "Views") +
+    # scale_x_discrete() +
+    scale_y_continuous(labels = comma) +
     theme(axis.text.y = element_text(size = 10),
-          axis.text.x = element_text(size = 10, angle = 90, vjust = 0.5, hjust = 1))
-  
+          axis.text.x = element_text(size = 10, angle = 90, vjust = 0.5, hjust = 1)) +
+    guides(x = guide_axis(check.overlap = TRUE))
+    
   print(p)
 }
 
