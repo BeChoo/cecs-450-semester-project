@@ -4,6 +4,7 @@ if [ "$#" -eq 0 ];
 then echo "Input file required";
 else
 for arg in $@ ; do
+echo "Creating : "$arg'.csv\n'
 echo "title~views~since_upload~link">$arg'.csv'
 grep -Eoz "\"=?v=?i=?d=?e=?o=?-=?t=?i=?t=?l=?e=?-=?l=?i=?n=?k=?\"[^>]*>" $arg|
 tr -d '\000'|
