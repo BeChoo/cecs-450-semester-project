@@ -1,49 +1,18 @@
 #!/bin/bash
-function days_since_2000(){
-	#constants
-	days_in_month_norm=(31 28 31 30 31 30 31 31 30 31 30 31)
-	days_in_month_leap=(31 29 31 30 31 30 31 31 30 31 30 31)
-	
-	day_sum=$2
-	day_sum=$(expr $day_sum + $(expr $3 \* 365))
-	day_sum=$(expr $day_sum + $(expr $3 / 4))
-
-	if [ $(expr $3 % 4) -eq 0 ]
-	then
-		#If the current year is a leap year,
-		#we'll account for it later.
-		day_sum=$(expr $day_sum - 1)
-		for i in `seq $(expr $1 - 2) -1 0`
-		do
-			day_sum=$(expr $day_sum + ${days_in_month_leap[i]})
-		done
-	else
-		for i in `seq $(expr $1 - 2) -1 0`
-		do
-			day_sum=$(expr $day_sum + ${days_in_month_norm[i]})
-		done
-	fi
-	echo $day_sum
-}
-
-function today_title_upload_to_csv-ints(){
-todaydate=$(echo $1|sed -E "s/([0-9]{1,2})-([0-9]{1,2})-([0-9]{2})/\1 \2 \3/g")
-gatherdate=$(echo $2|sed -E "s/.*_([0-9]{1,2})-([0-9]{1,2})-([0-9]{2}).*/\1 \2 \3/g")
-gather_day_difference=$(expr $(days_since_2000 $todaydate) - $(days_since_2000 $gatherdate))
-echo $todaydate $gatherdate $gather_day_difference|awk '{ printf("%d~%d~%d", $3-$6, ($3-$6)*12+$1-$4, $7) }'
-}
-
 
 if [ "$#" -eq 0 ];
 then echo "Input file required";
 else
+	match_timeunits="[ymwdhms][eoaoi][aneyunc][rksruo]?[shtn]?[sed]?[s]?"
 	today=$(date +"%m-%d-%y")
+	invalid_dump="collected_invalids"
+	rm $invalid_dump
+	touch $invalid_dump
+	start_time="$(date +%s%3N)"
 	for arg in $@ ; do
-		export -f today_title_upload_to_csv-ints
-		cat $arg|
-		sed 's/^/echo "$(today_title_upload_to_csv-ints $today $arg)~"/e'
-		#|xargs -d'~' to
-		#awk -F'~' 'BEGIN {line=0 } {printf("%s~%s~%s~%s\n",line, $1, $2, \t$3\t, $4 ); line+=1 }'
-		#echo $(today_title_upload_to_csv-ints $today $arg)
+		echo "Interpretting: $arg..."
+		python3 interpret-dates.py $today $arg $invalid_dump
 	done;
+	echo "$[ ( $(date +%s%3N) - ${start_time} ) ]" | 
+		awk '{time = $1 / 1000;printf "total run: %.3fs\n", time }'
 fi
