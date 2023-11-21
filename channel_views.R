@@ -29,13 +29,20 @@ for(file in files) {
   p <- ggplot(data, aes(x = since_upload, y = views, group = 1)) +
     geom_line() +
     labs(title = paste(file, "Line Graph of Views Over Time", sep = ': '), x = "Time Since Upload", y = "Views") +
-    # scale_x_discrete() +
-    scale_y_continuous(labels = comma) +
+    # scale_x_reverse() +
+    # scale_y_continuous(labels = comma) +
+    scale_y_log10(labels = comma) +
     theme(axis.text.y = element_text(size = 10),
-          axis.text.x = element_text(size = 10, angle = 90, vjust = 0.5, hjust = 1)) +
+          axis.text.x = element_text(size = 10, angle = 135, vjust = 0.5, hjust = 1)) +
     guides(x = guide_axis(check.overlap = TRUE))
     
   print(p)
 }
 
 dev.off()
+
+# NEED TO FIX LABEL ORDER
+# SHOULD BE DONE AFTER DATE SCRIPT IS COMPLETED
+
+# AVERAGE VIEW AND MAX VALUE OF EACH CHANNEL
+# COMPARE AVERAGE AND THE MOST THEY'VE GOTTEN
