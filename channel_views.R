@@ -11,8 +11,8 @@ directory_path <- paste(working_dir, csv_files, sep = '')
 # Set the working directory to the directory path set above
 setwd(directory_path)
 
-# List all files in the directory
-files <- list.files(directory_path)
+# List all files in the directory, ignoring files that are not CSVs
+files <- list.files(directory_path, pattern = "\\.csv$", full.names = TRUE)
 
 # Create a single PDF file for saving the graphs
 pdf("Views Over Time for All Channels.pdf")
@@ -23,26 +23,36 @@ for(file in files) {
   
   # 'views' is being read as a string, this will update it to an int
   data <- data %>%
-    mutate(views = as.numeric(gsub(",", "", views)))
+    mutate(numeric_views = as.numeric(gsub(",", "", views)))
+  
+  # 'uptime_d' is being read as a string, this will update it to an int
+  data <- data %>%
+    mutate(numeric_uptime_d = as.numeric(gsub(",", "", uptime_d)))
+  
+  # TODO
+  # implement unique and distinct on uptime_d
+  # see which gets better results and use that method
+  
+  # unique implementation
+  data$numeric_uptime_d <- unique(data$numeric_uptime_d)
+
+  # # distinct implementation
+  # data <- distinct(data, numeric_uptime_d)
   
   # Create a line graph
-  p <- ggplot(data, aes(x = since_upload, y = views, group = 1)) +
+  p <- ggplot(data, aes(x = numeric_uptime_d, y = numeric_views, group = 1)) +
     geom_line() +
     labs(title = paste(file, "Line Graph of Views Over Time", sep = ': '), x = "Time Since Upload", y = "Views") +
-    # scale_x_reverse() +
-    # scale_y_continuous(labels = comma) +
     scale_y_log10(labels = comma) +
+    scale_x_log10(labels = comma) +
     theme(axis.text.y = element_text(size = 10),
-          axis.text.x = element_text(size = 10, angle = 135, vjust = 0.5, hjust = 1)) +
-    guides(x = guide_axis(check.overlap = TRUE))
+          axis.text.x = element_text(size = 10, angle = 45, vjust = 0.5, hjust = 1))
+    # guides(x = guide_axis(check.overlap = TRUE))
     
   print(p)
 }
 
 dev.off()
-
-# NEED TO FIX LABEL ORDER
-# SHOULD BE DONE AFTER DATE SCRIPT IS COMPLETED
 
 # AVERAGE VIEW AND MAX VALUE OF EACH CHANNEL
 # COMPARE AVERAGE AND THE MOST THEY'VE GOTTEN
