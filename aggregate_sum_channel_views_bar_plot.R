@@ -1,4 +1,3 @@
-# UPDATE SO THAT OUTPUT FILE IS SAVED TO FOLDER
 library(ggplot2)
 library(dplyr)
 library(scales)
@@ -8,6 +7,11 @@ library(stringr)
 # Gets the current directory and adds the "csv" folder to the path
 # This assumes that the path is set up the same way as my local machine
 working_dir <- getwd()
+
+# Save the plot to a PDF in the "graph_pics" folder
+pdf("graph_pics/Bar_Plot_of_Aggregate_Views.pdf")
+
+# Navigate to the CSV files
 directory_path <- paste(working_dir, "/csv", sep = '')
 
 # Set the working directory to the directory path set above
@@ -15,8 +19,6 @@ setwd(directory_path)
 
 # List all files in the directory, ignoring files that are not CSVs
 files <- list.files(directory_path, pattern = "\\.csv$", full.names = TRUE)
-
-pdf("Bar Plot of Total Views for Every Channel.pdf")
 
 # Create an empty data frame to store aggregated data
 aggregate_data <- data.frame()
@@ -41,15 +43,19 @@ for (file in files) {
 
 aggregate_data$file <- str_extract(aggregate_data$file, "_([^_]+)_")
 
+# Convert the 'file' column to a factor with levels based on the order they were read
+aggregate_data$file <- factor(aggregate_data$file, levels = unique(aggregate_data$file))
+
 # Create a bar plot of the aggregated data
 ggplot(aggregate_data, aes(x = file, y = sum_views)) +
   geom_bar(stat = "identity") +
   labs(title = "Bar Plot of Aggregate Views", x = "Channel", y = "Sum of Views") +
-  # TODO
-  # scale_y_log10 isn't clear enough, try another scale
-  # scale_y_log10() +
   scale_y_continuous(labels = comma) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 30, hjust = 1, vjust = 1))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 7)) +
+  scale_x_discrete(labels = function(x) {
+    y_values <- aggregate_data$sum_views[match(x, aggregate_data$file)]
+    ifelse(seq_along(x) %% 4 == 1 | seq_along(x) == length(x) | y_values > 50000000000, x, "")
+  })
 
 dev.off()
