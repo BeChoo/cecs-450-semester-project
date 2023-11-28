@@ -1,8 +1,4 @@
-library(ggplot2)
-library(dplyr)
-library(scales)
 library(tidyverse)
-library(stringr)
 
 # Gets the current directory and adds the "csv" folder to the path
 # This assumes that the path is set up the same way as my local machine
