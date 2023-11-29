@@ -30,20 +30,20 @@ for (file in files) {
   data <- data %>%
     mutate(numeric_views = as.numeric(gsub(",", "", views)))
   
+  filename = basename(file)
+  
   # Create a box plot for the current file
-  plot <- ggplot(data, aes(x = file, y = numeric_views)) +
+  plot <- ggplot(data, aes(x = filename, y = numeric_views)) +
     geom_boxplot() +
-    labs(title = paste("Box Plot of Views for", file), x = "Channel", y = "Numeric Views") +
-    scale_y_continuous(labels = scales::comma) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1, size = 7))
+    labs(title = filename, x = "Channel", y = "Numeric Views") +
+    scale_y_log10(labels = scales::comma)
   
   # Save the plot to the list
-  plots[[file]] <- plot
+  plots[[filename]] <- plot
 }
 
-for (plot in plots) {
-  print(plot)
+for (filename in names(plots)) {
+  print(plots[[filename]])
 }
 
 dev.off()
