@@ -55,12 +55,18 @@ setwd(working_dir)
 
 vids_by_year <- vids_by_year %>% group_by(year)
 stats_by_year <- vids_by_year %>% 
-  summarise(median_views_in_millions=median(numeric_views)/million, max_views_in_millions=max(numeric_views)/million, avg_views_in_millions=mean(numeric_views)/million) %>%
-  filter(year!=2006)
+  summarise(median_views_in_millions=median(numeric_views)/million, max_views_in_millions=max(numeric_views)/million, avg_views_in_millions=mean(numeric_views)/million) 
+filtered_stats_by_year <- stats_by_year %>% filter(year!=2006)
   
-bar_yearly_stats <- ggplot(data=stats_by_year, aes(x=year, y=avg_views_in_millions, fill=median_views_in_millions)) + 
-  geom_col(position='stack',stat='identity')
+bar_yearly_stats <- ggplot(data=filtered_stats_by_year) + 
+  geom_col(aes(x=year, y=avg_views_in_millions), fill='#002f4a', color='#002f4a') +
+  geom_col(aes(x=year, y=median_views_in_millions), fill='#d9c4b1')
 show(bar_yearly_stats)
+
+biggest_by_year <- ggplot(data=stats_by_year) +
+  geom_col(aes(x=year, y=max_views_in_millions), fill='#002f4a') 
+#+geom_col(aes(x=year, y=avg_views_in_millions), fill='#d9c4b1')
+show(biggest_by_year)
 
 
 sub_vs_average_by_channel <- ggplot(data=channel_aggregate_data, mapping=aes(x=subs_in_millions, y=average_views_in_millions))+geom_point()
