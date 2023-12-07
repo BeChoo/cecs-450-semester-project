@@ -53,13 +53,18 @@ for (file in files) {
 }
 setwd(working_dir)
 
-stats_by_year <- vids_by_year %>% group_by(year) %>% 
-  summarise(median_views_in_millions=median(numeric_views)/million, max_views_in_millions=max(numeric_views)/million, avg_views_in_millions=mean(numeric_views)/million)
+vids_by_year <- vids_by_year %>% group_by(year)
+stats_by_year <- vids_by_year %>% 
+  summarise(median_views_in_millions=median(numeric_views)/million, max_views_in_millions=max(numeric_views)/million, avg_views_in_millions=mean(numeric_views)/million) %>%
+  filter(year!=2006)
+  
+bar_yearly_stats <- ggplot(data=stats_by_year, aes(x=year, y=avg_views_in_millions, fill=median_views_in_millions)) + 
+  geom_col(position='stack',stat='identity')
+show(bar_yearly_stats)
+
 
 sub_vs_average_by_channel <- ggplot(data=channel_aggregate_data, mapping=aes(x=subs_in_millions, y=average_views_in_millions))+geom_point()
 show(sub_vs_average_by_channel)
-
-
 
 
 dev.off
