@@ -21,7 +21,8 @@ setwd(directory_path)
 files <- list.files(directory_path, pattern = "\\.csv$", full.names = TRUE)
 
 # Create an empty data frame to store aggregated data
-aggregate_data <- data.frame()
+channel_aggregate_data <- data.frame()
+viedo_aggregate_data <- data.frame()
 
 
 
@@ -41,12 +42,18 @@ for (file in files) {
   
   # Calculate the sum of views
   avg_views <- mean(data$numeric_views, na.rm = TRUE)
+  med_views <- median(data$numeric_views, na.rm = TRUE)
+  yearly_data <- data %>% group_by(data$uptime_y)
+  
   # Append the data to the aggregate data frame
-  aggregate_data <- rbind(aggregate_data, data.frame(name = channel_name, mil_subs=sub_count,mil_avg_views = avg_views/1000000))
+  channel_aggregate_data <- rbind(channel_aggregate_data, data.frame(name = channel_name, mil_subs=sub_count, median_views = med_views,average_views = avg_views))
+  vid_aggregate_data <- rbind(video_aggregate_data, data.frame(year=2022-yearly_data$uptime_y))
 }
 
 setwd(working_dir)
-p <- ggplot(data=aggregate_data, mapping=aes(x=mil_subs, y=mil_avg_views))+geom_point()
-show(p)
+scatter <- ggplot(data=channel_aggregate_data, mapping=aes(x=mil_subs, y=average_views/1000000))+geom_point()
+show(scatter)
+
+
 
 dev.off
